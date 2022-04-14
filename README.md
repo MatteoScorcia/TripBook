@@ -56,10 +56,10 @@ To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
 * npm
 * docker
-    * docker container running a MongoDB 
+    * if(Installation != 'Full Stack')
+      * docker container running MongoDB
 
 
 
@@ -110,7 +110,7 @@ This is an example of how to list things you need to use the software and how to
 
 <div id="installation-prod"></div>
 
-### Installation (Build a single docker production ready)
+### Installation (Run a single docker)
 
 1. Clone the repo
    ```sh
