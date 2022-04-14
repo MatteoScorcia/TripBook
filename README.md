@@ -4,7 +4,7 @@
 <div id="about-the-project"></div>
 
 <!-- ABOUT THE PROJECT -->
-## Web Programming 2022 Project
+## Web Programming 2022 - TripBook
 
 We want to create a web application that acts as a chrono diary of one's movements.
 <br>
@@ -99,6 +99,8 @@ This is an example of how to list things you need to use the software and how to
    ```sh
     npm run dev
    ```
+   
+7. Navigate to  http://localhost:<your-app-port>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -124,17 +126,18 @@ This is an example of how to list things you need to use the software and how to
    
 4. Run this command to build the docker container and run it in interactive mode with your ENV variables
    ```sh
-      sudo docker run -it --init --rm -e PORT=<my-port> \
+      sudo docker run -it --init --rm -e PORT=<your-api-port> \
       -e MONGODB_URI="mongodb://<user>:<password>@<mongodb-url>:<mongodb-port>/<optional-db-name>" \
-      -e SECRET_KEY="<my-secret-key>" \
+      -e SECRET_KEY="<your-secret-key>" \
       -e MIGRATE=<"true" | "false"> \
-      -p 8888:4100 --name <container-name> node:koa-api
+      -p <your-app-port>:<your-api-port> --name <container-name> node:koa-api
    ```
  
-The SECRET_KEY is used to sign JWTs.
-<br>
-MIGRATE indicate if the docker should perform an insert of the NUTS.json into the MongoDB
+5. The SECRET_KEY is used to sign JWTs.
+   <br>
+   MIGRATE indicate if the docker should perform an insert of the NUTS.json into MongoDB
 
+6. Navigate to  http://localhost:<your-app-port>
 <div id="installation-full"></div>
 
 ### Installation (Full Stack)
@@ -149,6 +152,7 @@ MIGRATE indicate if the docker should perform an insert of the NUTS.json into th
       docker compose up -d
    ```
 
+3. Navigate to  http://localhost:8888
 <div id="license"></div>
 
 <!-- LICENSE -->
