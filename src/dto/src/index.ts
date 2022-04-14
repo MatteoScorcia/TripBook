@@ -40,7 +40,5 @@ export interface JwtDto {
     expiresIn: number;
 }
 
-export type ResponseApi<D> = { data?: D; error?: string };
-
 export type SuccessResponseApi<D> = { data: D };
 export type ErrorResponseApi<D> = { error: string };

@@ -1,5 +1,5 @@
 import * as Router from "koa-router";
-import {ErrorResponseApi, InsightsDto, ResponseApi, SuccessResponseApi, TripDto} from "@aindo/dto";
+import {ErrorResponseApi, InsightsDto, SuccessResponseApi, TripDto} from "@aindo/dto";
 import { TripModel } from "../models/TripModel";
 import * as mongoose from "mongoose";
 
