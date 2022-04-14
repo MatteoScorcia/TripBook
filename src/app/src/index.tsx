@@ -16,8 +16,7 @@ ReactDOM.render(
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App />}>
-
-                        <Route element={<RequireAuth/>}>
+                        <Route element={<RequireAuth />}>
                             <Route path="" element={<PageHome />} />
                             <Route path="trip/:id" element={<PageTrip />} />
                         </Route>

@@ -49,4 +49,3 @@ export function computeDistances(paths: TripPathPointDto[]) {
     }
     return totalDistance;
 }
-

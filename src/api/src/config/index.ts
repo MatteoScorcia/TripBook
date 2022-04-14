@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 
-if(process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production") {
     const envFound = dotenv.config();
 
     if (envFound.error) {

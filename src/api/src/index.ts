@@ -24,10 +24,9 @@ declare module "koa" {
 }
 
 (async () => {
-
     try {
         await connectToMongoDB();
-    } catch(err) {
+    } catch (err) {
         console.log("something went wrong during the connection to MongoDB\n", err);
     }
 
@@ -73,7 +72,6 @@ declare module "koa" {
     router.use("/insight", InsightRouter.allowedMethods());
     router.use("/insight", InsightRouter.routes());
 
-
     const superRouter = new Router();
 
     superRouter.use("/api", router.allowedMethods());
@@ -82,10 +80,10 @@ declare module "koa" {
     //method to serve the React app inside the koa routes :)
     superRouter.get(/^(?!\/api).*$/, async (ctx, next) => {
         try {
-            await send(ctx, ctx.path, { root: './static/', index: "index.html"});
+            await send(ctx, ctx.path, { root: "./static/", index: "index.html" });
         } catch (err) {
-            if(err.status === 404) {
-                await send(ctx, 'index.html', { root: './static/'});
+            if (err.status === 404) {
+                await send(ctx, "index.html", { root: "./static/" });
             } else {
                 throw err;
             }
