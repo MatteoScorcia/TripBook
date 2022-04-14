@@ -1,0 +1,15 @@
+{
+    "name": "@aindo/dto",
+    "private": true,
+    "version": "1.0.0",
+    "main": "dist/index",
+    "types": "dist/index",
+    "scripts": {
+        "test": "echo 'No tests available'",
+        "dev": "echo 'No dev available'",
+        "build": "tsc -b --force"
+    },
+    "devDependencies": {
+        "typescript": "^4.6.3"
+    }
+}

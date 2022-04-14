@@ -1,0 +1,31 @@
+{
+    "name": "@aindo/monorepo",
+    "version": "1.0.0",
+    "keywords": [],
+    "author": "Matteo Scorcia <matteo@aindo.com>",
+    "license": "",
+    "scripts": {
+        "clean": "rimraf \"**/build\" \"**/dist\" \"**/*.tsbuildinfo\" \"package-lock.json\" ",
+        "build": "npm run build --workspaces",
+        "test": "npm run test --workspaces",
+        "dev": "concurrently \"npm -w src/api run dev\" \"npm -w src/app run dev\"",
+        "lint": "eslint . --fix",
+        "pretty": "prettier --write ."
+    },
+    "workspaces": [
+        "src/*"
+    ],
+    "devDependencies": {
+        "@types/node": "^16.11.26",
+        "@typescript-eslint/eslint-plugin": "^5.12.1",
+        "@typescript-eslint/parser": "^5.12.1",
+        "concurrently": "^7.0.0",
+        "dotenv-cli": "^5.0.0",
+        "eslint": "^8.10.0",
+        "prettier": "^2.5.1",
+        "typescript": "^4.5.5"
+    },
+    "dependencies": {
+        "tslib": "^2.3.1"
+    }
+}
