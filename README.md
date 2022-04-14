@@ -44,6 +44,13 @@ The application will allow a registered user to store information relating to th
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+### TL;DR
+1. Build and run the docker containers
+   ```sh
+       docker compose up -d
+   ```
+2. Navigate to "http://localhost:8888"
+
 <div id="getting-started"></div>
 
 <!-- GETTING STARTED -->
@@ -81,14 +88,10 @@ To get a local copy up and running follow these simple example steps.
      SECRET_KEY = <your-secret-key-for-hashing-database-passwords>
     ```
 
-4. Enter <your-api-port> in `src/app/package.json`
+4. Enter <your-api-port> in `src/app/src/setupProxy.js`
     ```sh
      ...
-     "scripts": {
-         ...
-            "dev": "dotenv -v PORT=<your-app-port>-- react-scripts start"
-     }
-     "proxy": "http://localhost:<your-api-port>",
+     target: 'http://localhost:<your-api-port>',
      ...
     ```
 5. Run this script to save the [NUTS](https://ec.europa.eu/eurostat/web/nuts/background) database into your MongoDB
@@ -101,7 +104,7 @@ To get a local copy up and running follow these simple example steps.
     ```sh
      npm run dev
     ```
-7. Navigate to http://localhost:<your-app-port>
+7. Navigate to "http://localhost:<your-app-port>"
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -139,7 +142,7 @@ To get a local copy up and running follow these simple example steps.
    <br>
    MIGRATE indicate if the docker should perform an insert of the NUTS.json into MongoDB
 
-6. Navigate to http://localhost:<your-app-port>
+6. Navigate to "http://localhost:<your-app-port>"
 
 <div id="installation-full"></div>
 
@@ -151,13 +154,13 @@ To get a local copy up and running follow these simple example steps.
      git clone https://github.com/MatteoScorcia/TripBook.git
     ```
 
-2. Run this command inside the repository to build the docker containers from the docker-compose.yml
+2. Run this command inside the repository to build and run the docker containers from the docker-compose.yml
 
     ```sh
        docker compose up -d
     ```
 
-3. Navigate to http://localhost:8888
+3. Navigate to "http://localhost:8888"
 
 4. When you have finished remember to remove everything
     ```sh
