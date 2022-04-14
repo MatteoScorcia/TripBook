@@ -61,6 +61,8 @@ This is an example of how to list things you need to use the software and how to
 * docker
     * docker container running a MongoDB 
 
+
+
 <div id="installation-dev"></div>
 
 ### Installation (Run Development Environment)
@@ -105,6 +107,7 @@ This is an example of how to list things you need to use the software and how to
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+
 <div id="installation-prod"></div>
 
 ### Installation (Build a single docker production ready)
@@ -138,6 +141,9 @@ This is an example of how to list things you need to use the software and how to
    MIGRATE indicate if the docker should perform an insert of the NUTS.json into MongoDB
 
 6. Navigate to  http://localhost:<your-app-port>
+
+
+
 <div id="installation-full"></div>
 
 ### Installation (Full Stack)
@@ -153,6 +159,16 @@ This is an example of how to list things you need to use the software and how to
    ```
 
 3. Navigate to  http://localhost:8888
+
+4. When you have finished remember to remove everything
+    ```sh
+      docker compose down --volumes
+      docker image rm <ID-app-image> <ID-mongo-image>
+      docker volume rm <ID-mongo-volume>
+   ```
+   
+
+
 <div id="license"></div>
 
 <!-- LICENSE -->
