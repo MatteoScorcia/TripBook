@@ -44,6 +44,12 @@ router.post("/signup", async (ctx) => {
         return;
     }
 
+    if (!userToSave.name || !userToSave.name.match(/^[^\W\d_]+$/)) {
+        ctx.status = 400;
+        ctx.body = { error: "Invalid user field special characters and spaces not allowed" } as ErrorResponseApi<UserDto>;
+        return;
+    }
+
     userToSave.name = userToSave.name.toLowerCase();
     userToSave.email = userToSave.email.toLowerCase();
 

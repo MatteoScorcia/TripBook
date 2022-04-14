@@ -6,7 +6,7 @@
     "types": "dist/index",
     "scripts": {
         "build": "tsc -b --force",
-        "test": "jest",
+        "test": "dotenv -- jest",
         "migrate": "MIGRATE=true ts-node src/migrationNUTS.ts",
         "dev-broken": "nodemon --watch ./ --watch ../dto ./src/index.ts",
         "dev": "tsc -b && concurrently --prefix \" \" --hide \"0\" \"tsc -b -w\" \"dotenv -- nodemon ./dist/index.js\""

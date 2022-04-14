@@ -23,7 +23,7 @@ export async function computeNearestPlaces(paths: TripPathPointDto[]) {
                     },
                 },
             },
-            null,
+            {properties: true},
             { sort: { "properties.LEVL_CODE": -1 } }
         );
     });

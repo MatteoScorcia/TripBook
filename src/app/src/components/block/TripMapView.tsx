@@ -73,7 +73,7 @@ function SingleTrip(props: {
 
     //react-leaflet built-in hook to handle events on map instance
     useMapEvents({
-        dblclick: (e) => {
+        click: (e) => {
             if (editable) {
                 // STORE NEW POSITION IN TRIP OBJECT
                 const newPosition: TripPathPointDto = { lat: e.latlng.lat, lng: e.latlng.lng };
