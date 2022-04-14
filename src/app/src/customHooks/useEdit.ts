@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { usePatch } from "./usePatch";
-import { ResponseApi } from "@aindo/dto";
+import {SuccessResponseApi} from "@aindo/dto";
 
 interface UseEditHookState<D> {
     isLoading: boolean;
@@ -26,13 +26,13 @@ interface UseEditHookState<D> {
 return {state, resetState, isDirty, setState, patchState, doSave, doFetch}
 */
 
-type UseEditFetcher<D, I extends any[] = any[]> = (...input: I) => Promise<ResponseApi<D>>;
-type UseEditSaver<D> = (input: D) => Promise<ResponseApi<D>>;
+type UseEditFetcher<D, I extends any[] = any[]> = (...input: I) => Promise<SuccessResponseApi<D>>;
+type UseEditSaver<D> = (input: D) => Promise<SuccessResponseApi<D>>;
 
 export function useEdit<D, I extends any[] = any[]>(
     fetcher: UseEditFetcher<D, I>,
     saver: UseEditSaver<D>,
-    ...input: I
+    input: I
 ) {
     const [state, setState, patchState] = usePatch<UseEditHookState<D>>({
         isLoading: false,
@@ -44,12 +44,12 @@ export function useEdit<D, I extends any[] = any[]>(
     });
 
     useEffect(() => {
-        fetch();
+        fetch().catch(console.error);
     }, input);
 
-    function fetch() {
+    function fetch(): Promise<D> {
         patchState({ error: undefined, isLoading: true });
-        fetcher(...input)
+        return fetcher(...input)
             .then((response) => {
                 patchState({
                     isLoading: false,
@@ -57,34 +57,42 @@ export function useEdit<D, I extends any[] = any[]>(
                     dto: response.data,
                     rollBackDto: response.data,
                 });
+                return response.data;
             })
             .catch((err) => {
-                const errorMessage = [err.message, err.response.data.error] as [string, string];
+                const errorMessage = [err?.message, err?.response?.data?.error] as [string, string];
                 patchState({ error: errorMessage, isLoading: false });
+                return Promise.reject(err);
             });
     }
 
-    function save() {
+    function save(): Promise<D> {
         patchState({ error: undefined, isLoading: true, isSaving: true });
-        saver(state.dto!)
-            .then((response) =>
+        return saver(state.dto!)
+            .then((response) => {
                 patchState({
                     isLoading: false,
                     isSaving: false,
                     isDirty: false,
                     dto: response.data,
                     rollBackDto: response.data,
-                })
-            )
+                });
+                return response.data;
+            })
             .catch((err) => {
-                const errorMessage = [err.message, err.response.data.error] as [string, string];
+                const errorMessage = [err?.message, err?.response?.data?.error] as [string, string];
                 patchState({ error: errorMessage, isLoading: false, isSaving: false });
+                return Promise.reject(err);
             });
     }
 
     return {
         ...state,
         setDto: (dto: D) => patchState({ dto, isDirty: true }),
+        resetError: () =>
+            patchState({
+                error: undefined,
+            }),
         resetState: () =>
             patchState({
                 isDirty: false,

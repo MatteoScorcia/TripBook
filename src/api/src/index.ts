@@ -11,7 +11,7 @@ import { connectToMongoDB } from "./dal";
 import * as Router from "koa-router";
 
 import config from "./config";
-import { JwtToSignDto, ResponseApi } from "@aindo/dto";
+import {ErrorResponseApi, JwtToSignDto} from "@aindo/dto";
 import { JwtPayload } from "jsonwebtoken";
 import * as send from "koa-send";
 
@@ -27,7 +27,8 @@ declare module "koa" {
     try {
         await connectToMongoDB();
     } catch (err) {
-        console.log("something went wrong during the connection to MongoDB\n", err);
+        console.log("something went wrong, cannot connect to MongoDB\n\n", err);
+        process.exit(-1);
     }
 
     const app = new Koa();
@@ -46,24 +47,31 @@ declare module "koa" {
     router.use(async (ctx, next) => {
         if (!ctx.header.authorization) {
             ctx.status = 403;
-            ctx.body = { error: "Authorization header not provided" } as ResponseApi<JwtToSignDto>;
+            ctx.body = { error: "Authorization header not provided" } as ErrorResponseApi<JwtToSignDto>;
             return;
         }
 
         const [bearer, tokenRequest] = ctx.header.authorization.split(" ");
         if (bearer !== "Bearer") {
-            ctx.status = 401;
-            ctx.body = { error: "Wrong Authorization header format" } as ResponseApi<JwtToSignDto>;
+            ctx.status = 403;
+            ctx.body = { error: "Wrong Authorization header format" } as ErrorResponseApi<JwtToSignDto>;
             return;
         }
 
         try {
             const decoded = jwt.verify(tokenRequest, config.secretKey);
             ctx.auth = { userId: (decoded as JwtPayload).user.userId };
-            await next();
         } catch (e) {
             ctx.status = 403;
-            ctx.body = { error: "invalid token" } as ResponseApi<JwtToSignDto>;
+            ctx.body = { error: "invalid token" } as ErrorResponseApi<JwtToSignDto>;
+            return;
+        }
+
+        try {
+            await next();
+        } catch (e) {
+            ctx.status = 500;
+            ctx.body = { error: "Internal server error" } as ErrorResponseApi<string>;
         }
     });
 

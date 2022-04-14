@@ -12,12 +12,12 @@ export default function TripStatistics(props: {
     className?: string;
     currentDate: Date;
 }) {
-    const [showModal, setShowModal] = useState(true);
     const { className, currentDate } = props;
 
     const {
         isLoading: isStatisticsLoading,
         error: statisticsError,
+        resetError: resetStatisticsError,
         dto: dateStatistics,
     } = useGet<InsightsDto[]>((date) => TripApi.getStatisticsByDay(date), currentDate);
 
@@ -54,10 +54,9 @@ export default function TripStatistics(props: {
 
             {statisticsError && (
                 <Modal
-                    show={showModal}
-                    title={""}
+                    show={true}
                     actionButtons={
-                        <Button accent={true} onClick={() => setShowModal(false)}>
+                        <Button accent={true} onClick={resetStatisticsError}>
                             <span>Close</span>
                         </Button>
                     }

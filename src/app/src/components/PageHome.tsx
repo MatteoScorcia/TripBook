@@ -16,6 +16,8 @@ import CalendarView from "./block/CalendarView";
 import { useAuth } from "../customHooks/useAuth";
 
 export default function PageHome() {
+    const navigate = useNavigate();
+
     const { date: currentDate, setDate: setCurrentDate } = useDateUrlParam(
         dateEncoder,
         dateDecoder,
@@ -27,10 +29,6 @@ export default function PageHome() {
         error: fetchError,
         dto: selectedTrips,
     } = useGet<TripDto[]>((date) => TripApi.getTripsByDate(date), currentDate);
-
-    const [showModal] = useState(true);
-
-    const navigate = useNavigate();
 
     const navigateToPage = (url: string) => {
         navigate(url);
@@ -55,8 +53,7 @@ export default function PageHome() {
 
             {fetchError && (
                 <Modal
-                    show={showModal}
-                    title={""}
+                    show={true}
                     actionButtons={
                         <Button accent={true} onClick={() => window.location.reload()}>
                             <span>Reload</span>

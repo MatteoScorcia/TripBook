@@ -1,5 +1,5 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import { UserDto } from "@aindo/dto";
 
 export interface AuthState {
@@ -22,8 +22,10 @@ axios.interceptors.response.use(
     (response) => {
         return response;
     },
-    async (err) => {
-        _AUTH_FAILED_CALLBACK && _AUTH_FAILED_CALLBACK();
+    async (err: AxiosError) => {
+        if (err?.response?.status === 403) {
+            _AUTH_FAILED_CALLBACK && _AUTH_FAILED_CALLBACK();
+        }
         return Promise.reject(err);
     }
 );
@@ -39,7 +41,7 @@ axios.interceptors.request.use((response) => {
 
 export const AuthProvider = (props: { children: ReactNode }) => {
     const [auth, setAuth] = useState<AuthState | undefined>(() => {
-        const storedState = sessionStorage.getItem("user");
+        const storedState = sessionStorage.getItem("authState");
         return storedState ? JSON.parse(storedState) : undefined;
     });
 

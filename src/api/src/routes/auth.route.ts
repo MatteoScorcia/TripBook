@@ -16,21 +16,15 @@ const router = new Router();
 const expireTime = 60 * 60; //in seconds
 
 router.use(async (ctx, next) => {
-    const user = ctx.request.body;
+    const user = ctx.request.body.user;
 
-    if (user.name && user.name.length < 4) {
+    if (!user.name || user.name.length < 4) {
         ctx.status = 400;
         ctx.body = { error: "Invalid name field, at least 4 characters required" } as ResponseApi<UserDto>;
         return;
     }
 
-    if (user.email && !user.email.toLowerCase().match(/^\S+@\S+\.\S+$/)) {
-        ctx.status = 400;
-        ctx.body = { error: "Invalid email field" } as ResponseApi<UserDto>;
-        return;
-    }
-
-    if (user.password && user.password.length < 4) {
+    if (!user.password || user.password.length < 4) {
         ctx.status = 400;
         ctx.body = {
             error: "Invalid password field, at least 4 characters required",
@@ -43,6 +37,15 @@ router.use(async (ctx, next) => {
 
 router.post("/signup", async (ctx) => {
     const userToSave = ctx.request.body.user as UserDto;
+
+    if (!userToSave.email || !userToSave.email.match(/^\S+@\S+\.\S+$/)) {
+        ctx.status = 400;
+        ctx.body = { error: "Invalid email field" } as ResponseApi<UserDto>;
+        return;
+    }
+
+    userToSave.name = userToSave.name.toLowerCase();
+    userToSave.email = userToSave.email.toLowerCase();
 
     if ((await UserModel.findOne({ name: userToSave.name })) !== null) {
         ctx.status = 409;
@@ -72,6 +75,7 @@ router.post("/signup", async (ctx) => {
 
 router.post("/login", async (ctx) => {
     const userRequest = ctx.request.body.user as Omit<UserDto, "email">;
+    userRequest.name = userRequest.name.toLowerCase();
     const userFind = await UserModel.findOne({ name: userRequest.name });
 
     if (userFind === null) {

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, {KeyboardEvent, useState} from "react";
 import travelImg from "../img/travel.jpg";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Button } from "./common/Button";
-import { useAuth } from "../customHooks/useAuth";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Button} from "./common/Button";
+import {useAuth} from "../customHooks/useAuth";
 import warning from "../img/warning.png";
-import { Modal } from "./common/Modal";
-import { ReactComponent as Logo } from "../svg/logo.svg";
+import {Modal} from "./common/Modal";
+import {ReactComponent as Logo} from "../svg/logo.svg";
 
 export default function PageAuth(props: { sign: "login" | "sign-up" }) {
     const { sign } = props;
@@ -35,8 +35,7 @@ export default function PageAuth(props: { sign: "login" | "sign-up" }) {
         });
     }
 
-    function handleSubmit(event: any) {
-        event.preventDefault();
+    function handleSubmit() {
         if (sign === "login") {
             login(formData.name, formData.password)
                 .then(() => {
@@ -56,8 +55,14 @@ export default function PageAuth(props: { sign: "login" | "sign-up" }) {
         }
     }
 
+    function handleKeyDown(event: KeyboardEvent<HTMLInputElement>){
+        if(event.key === "Enter") {
+            handleSubmit()
+        }
+    }
+
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row" onKeyDown={handleKeyDown}>
             <div className="w-1/2 flex justify-center items-center">
                 <div className="bg-white p-4 flex flex-col items-center shadow-md rounded-md space-y-4">
                     <div className="flex justify-center">
@@ -111,8 +116,7 @@ export default function PageAuth(props: { sign: "login" | "sign-up" }) {
 
             {authError && (
                 <Modal
-                    show={!!authError}
-                    title={""}
+                    show={true}
                     actionButtons={
                         <Button accent={true} onClick={() => setAuthError(undefined)}>
                             <span>Close</span>

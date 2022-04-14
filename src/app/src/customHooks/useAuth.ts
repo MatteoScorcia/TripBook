@@ -1,20 +1,20 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthProvider";
-import { AuthApi } from "../network/AuthApi";
+import {useContext} from "react";
+import {AuthContext} from "../context/AuthProvider";
+import {AuthApi} from "../network/AuthApi";
 
 export function useAuth() {
     const context = useContext(AuthContext);
 
     const signup = async (name: string, password: string, email: string) => {
-        return AuthApi.signUp({ name, password, email }).then((res) => {
-            console.log("signup", res.data);
+        return AuthApi.signUp({ name, password, email })
+            .then((res) => {
             context.setAuth({
                 user: { name },
                 token: res.data!.token,
                 expiresIn: res.data!.expiresIn,
             });
             sessionStorage.setItem(
-                "user",
+                "authState",
                 JSON.stringify({
                     user: { name },
                     token: res.data!.token,
@@ -25,15 +25,15 @@ export function useAuth() {
     };
 
     const login = async (name: string, password: string) => {
-        return AuthApi.login({ name, password }).then((res) => {
-            console.log("login", res.data);
+        return AuthApi.login({ name, password })
+            .then((res) => {
             context.setAuth({
                 user: { name },
                 token: res.data!.token,
                 expiresIn: res.data!.expiresIn,
             });
             sessionStorage.setItem(
-                "user",
+                "authState",
                 JSON.stringify({
                     user: { name },
                     token: res.data!.token,
