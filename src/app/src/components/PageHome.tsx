@@ -49,8 +49,10 @@ export default function PageHome() {
                 <TripStatistics currentDate={currentDate} className={"overflow-y-auto -mr-4 pr-4"} />
             </Navbar>
 
+            {/* Map body and cards */}
             <TripView trips={selectedTrips || []} onNavigate={navigateToPage} />
 
+            {/* Error modal */}
             {fetchError && (
                 <Modal
                     show={true}
@@ -70,6 +72,7 @@ export default function PageHome() {
                     </div>
                 </Modal>
             )}
+
         </div>
     );
 }

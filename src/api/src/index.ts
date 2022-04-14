@@ -2,18 +2,17 @@ import * as Koa from "koa";
 import * as logger from "koa-logger";
 import * as json from "koa-json";
 import * as bodyParser from "koa-bodyparser";
-import * as jwt from "jsonwebtoken";
 
-import { TripRouter } from "./routes/trip.route";
-import { AuthRouter } from "./routes/auth.route";
-import { InsightRouter } from "./routes/insight.route";
-import { connectToMongoDB } from "./dal";
+import {TripRouter} from "./routes/trip.route";
+import {AuthRouter} from "./routes/auth.route";
+import {InsightRouter} from "./routes/insight.route";
+import {connectToMongoDB} from "./dal";
 import * as Router from "koa-router";
 
 import config from "./config";
-import {ErrorResponseApi, JwtToSignDto} from "@aindo/dto";
-import { JwtPayload } from "jsonwebtoken";
 import * as send from "koa-send";
+import {authorizationHeaderValidator} from "./middlewares/authorizationHeaderValidator";
+import {internalErrorCatcher} from "./middlewares/internalErrorCatcher";
 
 declare module "koa" {
     interface BaseContext {
@@ -34,6 +33,7 @@ declare module "koa" {
     const app = new Koa();
 
     // Middlewares
+    app.use(internalErrorCatcher());
     app.use(json());
     app.use(logger());
     app.use(bodyParser());
@@ -43,37 +43,7 @@ declare module "koa" {
     // Routes
     router.use("/auth", AuthRouter.allowedMethods());
     router.use("/auth", AuthRouter.routes());
-
-    router.use(async (ctx, next) => {
-        if (!ctx.header.authorization) {
-            ctx.status = 403;
-            ctx.body = { error: "Authorization header not provided" } as ErrorResponseApi<JwtToSignDto>;
-            return;
-        }
-
-        const [bearer, tokenRequest] = ctx.header.authorization.split(" ");
-        if (bearer !== "Bearer") {
-            ctx.status = 403;
-            ctx.body = { error: "Wrong Authorization header format" } as ErrorResponseApi<JwtToSignDto>;
-            return;
-        }
-
-        try {
-            const decoded = jwt.verify(tokenRequest, config.secretKey);
-            ctx.auth = { userId: (decoded as JwtPayload).user.userId };
-        } catch (e) {
-            ctx.status = 403;
-            ctx.body = { error: "invalid token" } as ErrorResponseApi<JwtToSignDto>;
-            return;
-        }
-
-        try {
-            await next();
-        } catch (e) {
-            ctx.status = 500;
-            ctx.body = { error: "Internal server error" } as ErrorResponseApi<string>;
-        }
-    });
+    router.use("/auth", authorizationHeaderValidator());
 
     router.use("/trip", TripRouter.allowedMethods());
     router.use("/trip", TripRouter.routes());

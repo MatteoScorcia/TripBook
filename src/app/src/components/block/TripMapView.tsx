@@ -29,27 +29,26 @@ export default function TripMapView(props: {
     const initialCenter: LatLngLiteral = useMemo(() => {
         const arrayTrip = Array.isArray(trip) ? trip : [trip];
         if (arrayTrip.length !== 0) {
-            return arrayTrip[0].paths.length !== 0 ? arrayTrip[0].paths[0] : { lat: 0, lng: 0 };
+            return arrayTrip[0].paths.length !== 0 ? arrayTrip[0].paths[0] : { lat: 47, lng: 20 };
         }
-        return { lat: 0, lng: 0 };
+        return { lat: 47, lng: 20 };
     }, []);
 
     return (
-        <MapContainer className="h-screen w-full" zoom={4} center={initialCenter} doubleClickZoom={false}>
+        <MapContainer className="h-screen w-full" zoom={5} center={initialCenter} doubleClickZoom={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {trip &&
-                (Array.isArray(trip) ? trip : [trip]).map((t, tIdx) => (
+                (Array.isArray(trip) ? trip : [trip]).map((singleTrip, idx) => (
                     <SingleTrip
-                        key={tIdx}
-                        trip={t}
-                        highlight={tIdx === (highlightIdx || 0)}
-                        //hack to always pass a boolean value to editable
+                        key={idx}
+                        trip={singleTrip}
+                        highlight={idx === (highlightIdx || 0)}
                         editable={!!editable}
-                        onEdit={(tt) => onEdit && onEdit(tt, tIdx)}
-                        onClick={() => onClick && onClick(t, tIdx)}
+                        onEdit={(tt) => onEdit && onEdit(tt, idx)}
+                        onClick={() => onClick && onClick(singleTrip, idx)}
                     />
                 ))}
         </MapContainer>
@@ -83,13 +82,13 @@ function SingleTrip(props: {
         },
     });
 
-    //hook that returns map instance
+    //hook that returns leaflet map instance
     const map = useMap();
 
     //if highlight or trip changes, pan to new 'center of trip'
     useEffect(() => {
         if (highlight && !editable && trip.paths.length !== 0) {
-            map.panTo(computeCenterTrip(trip), { animate: true, duration: 0.5 });
+            // map.panTo(computeCenterTrip(trip), { animate: true, duration: 0.5 });
             map.fitBounds([trip.paths.map((path) => [path.lat, path.lng]) as unknown as LatLngTuple], {
                 animate: true,
                 duration: 0.5,
@@ -135,7 +134,6 @@ function SingleTrip(props: {
                             drag: (event) => onMarkerDrag(pIdx, event),
                             click: onClick,
                         }}
-                        // icon={iconMarker}
                     >
                         <Popup>
                             <div className="flex flex-col w-full font-semibold">

@@ -75,8 +75,6 @@ export default function PageTrip() {
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState<[string, string] | undefined>(undefined);
 
-    console.log('RENDER', deleteLoading, deleteError)
-
     const handleDelete = () => {
         if (!createNew) {
             setDeleteLoading(true);

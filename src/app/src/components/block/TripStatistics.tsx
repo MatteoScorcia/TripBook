@@ -29,7 +29,7 @@ export default function TripStatistics(props: {
             {dateStatistics && (
                 <div className="mr-12">
                     {dateStatistics.map((tripStatistic, idx) => {
-                        if (tripStatistic && tripStatistic.country && tripStatistic.count) {
+                        if (tripStatistic && tripStatistic.count) {
                             const numberOfStages = dateStatistics.reduce(
                                 (prev, curr) => (curr.count ? prev + curr.count : prev),
                                 0
@@ -40,7 +40,9 @@ export default function TripStatistics(props: {
                                     <div className="absolute top-0 left-0 ml-[100%] text-disabled">
                                         {Math.round(percentage).toFixed(0)}%
                                     </div>
-                                    <span className="text-emphasis">{tripStatistic.country}</span>
+                                    <span className="text-emphasis">
+                                        {tripStatistic.country || "unavailable"}
+                                    </span>
                                     <div
                                         className={`top-0 left-0 h-1 rounded-full bg-primary-normal`}
                                         style={{ width: `${percentage * 0.97 + 3}%` }}
