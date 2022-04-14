@@ -1,5 +1,5 @@
 import * as Router from "koa-router";
-import { JwtDto, ResponseApi, UserDto } from "@aindo/dto";
+import {ErrorResponseApi, JwtDto, SuccessResponseApi, UserDto} from "@aindo/dto";
 import { UserModel } from "../models/UserModel";
 
 import * as jwt from "jsonwebtoken";
@@ -20,7 +20,7 @@ router.use(async (ctx, next) => {
 
     if (!user.name || user.name.length < 4) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid name field, at least 4 characters required" } as ResponseApi<UserDto>;
+        ctx.body = { error: "Invalid name field, at least 4 characters required" } as ErrorResponseApi<UserDto>;
         return;
     }
 
@@ -28,7 +28,7 @@ router.use(async (ctx, next) => {
         ctx.status = 400;
         ctx.body = {
             error: "Invalid password field, at least 4 characters required",
-        } as ResponseApi<UserDto>;
+        } as ErrorResponseApi<UserDto>;
         return;
     }
 
@@ -40,7 +40,7 @@ router.post("/signup", async (ctx) => {
 
     if (!userToSave.email || !userToSave.email.match(/^\S+@\S+\.\S+$/)) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid email field" } as ResponseApi<UserDto>;
+        ctx.body = { error: "Invalid email field" } as ErrorResponseApi<UserDto>;
         return;
     }
 
@@ -49,13 +49,13 @@ router.post("/signup", async (ctx) => {
 
     if ((await UserModel.findOne({ name: userToSave.name })) !== null) {
         ctx.status = 409;
-        ctx.body = { error: "Username already taken" };
+        ctx.body = { error: "Username already taken" } as ErrorResponseApi<UserDto>;
         return;
     }
 
     if ((await UserModel.findOne({ email: userToSave.email })) !== null) {
         ctx.status = 409;
-        ctx.body = { error: "Email already taken" };
+        ctx.body = { error: "Email already taken" } as ErrorResponseApi<UserDto>;
         return;
     }
 
@@ -70,7 +70,7 @@ router.post("/signup", async (ctx) => {
             token: jwt.sign({ user: { userId: userSaved._id } }, config.secretKey, { expiresIn: expireTime }),
             expiresIn: expireTime - 1,
         },
-    } as ResponseApi<JwtDto>;
+    } as SuccessResponseApi<JwtDto>;
 });
 
 router.post("/login", async (ctx) => {
@@ -80,11 +80,11 @@ router.post("/login", async (ctx) => {
 
     if (userFind === null) {
         ctx.status = 401;
-        ctx.body = { error: "Wrong name or password" } as ResponseApi<UserDto>;
+        ctx.body = { error: "Wrong name or password" } as ErrorResponseApi<UserDto>;
         await wait(Math.floor(Math.random() * 3 + 1)); //random delayed response to avoid timing attacks
     } else if (!(await userFind.validatePassword(userRequest.password))) {
         ctx.status = 401;
-        ctx.body = { error: "Wrong name or password" } as ResponseApi<UserDto>;
+        ctx.body = { error: "Wrong name or password" } as ErrorResponseApi<UserDto>;
         await wait(Math.floor(Math.random() * 3 + 1)); //random delayed response to avoid timing attacks
     } else {
         ctx.auth = {
@@ -98,7 +98,7 @@ router.post("/login", async (ctx) => {
                 }),
                 expiresIn: expireTime - 1,
             },
-        } as ResponseApi<JwtDto>;
+        } as SuccessResponseApi<JwtDto>;
     }
 });
 

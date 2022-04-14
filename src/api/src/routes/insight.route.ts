@@ -1,15 +1,8 @@
 import * as Router from "koa-router";
 import { TripModel } from "../models/TripModel";
-import { InsightsDto, ResponseApi } from "@aindo/dto";
+import {ErrorResponseApi, InsightsDto, SuccessResponseApi} from "@aindo/dto";
 
 const router = new Router();
-
-// function parseDate(string: string): Date {
-//     if (typeof string !== 'string' || isNaN(new Date(string).getTime())) {
-//         throw new ERROR_400_BAD_REQUEST({ detail: `Invalid date field ${string}` });
-//     }
-//     return new Date(string);
-// }
 
 router.use(async (ctx, next) => {
     if (
@@ -19,7 +12,7 @@ router.use(async (ctx, next) => {
         isNaN(new Date(ctx.query.toDate).getTime())
     ) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid date field" } as ResponseApi<InsightsDto>;
+        ctx.body = { error: "Invalid date field" } as ErrorResponseApi<InsightsDto>;
         return;
     }
     await next();
@@ -28,7 +21,7 @@ router.use(async (ctx, next) => {
 router.get("/tripsCountByDate", async (ctx) => {
     if (typeof ctx.query.gmtOffset !== "string" || !/^[+-]\d\d(:\d\d|\d\d)?$/.test(ctx.query.gmtOffset)) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid gmtOffset field" };
+        ctx.body = { error: "Invalid gmtOffset field" } as ErrorResponseApi<InsightsDto>;
         return;
     }
 
@@ -53,14 +46,14 @@ router.get("/tripsCountByDate", async (ctx) => {
         { $project: { _id: false, date: "$_id", count: true } },
     ]);
 
-    ctx.body = { data: tripCounts } as ResponseApi<InsightsDto>;
+    ctx.body = { data: tripCounts } as SuccessResponseApi<InsightsDto>;
 });
 
 router.get("/stagesByDate", async (ctx) => {
     const level = parseInt((ctx.query.level as string) || "3");
     if (isNaN(level) || level < 0 || level > 3) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid level field" };
+        ctx.body = { error: "Invalid level field" } as ErrorResponseApi<InsightsDto>;
         return;
     }
 
@@ -75,7 +68,7 @@ router.get("/stagesByDate", async (ctx) => {
         { $project: { _id: false, country: "$_id", count: true } },
     ]);
 
-    ctx.body = { data: numberOfStages } as ResponseApi<InsightsDto>;
+    ctx.body = { data: numberOfStages } as SuccessResponseApi<InsightsDto>;
 });
 
 export const InsightRouter = router;
