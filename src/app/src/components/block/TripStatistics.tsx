@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { InsightsDto } from "@aindo/dto";
+import {InsightsDto, SuccessResponseApi} from "@aindo/dto";
 import classNames from "classnames";
-import { useGet } from "../../customHooks/useGet";
 import { TripApi } from "../../network/TripApi";
 import { Modal } from "../common/Modal";
 import { Button } from "../common/Button";
 import warning from "../../img/warning.png";
+import {useQuery} from "react-query";
+import {AxiosError} from "axios";
 
 export default function TripStatistics(props: {
     children?: JSX.Element;
@@ -13,13 +14,21 @@ export default function TripStatistics(props: {
     currentDate: Date;
 }) {
     const { className, currentDate } = props;
+    const [showStatisticsError, setShowStatisticsError] = useState(false);
 
     const {
         isLoading: isStatisticsLoading,
         error: statisticsError,
-        resetError: resetStatisticsError,
-        dto: dateStatistics,
-    } = useGet<InsightsDto[]>((date) => TripApi.getStatisticsByDay(date), currentDate);
+        data: dateStatistics,
+    } = useQuery<SuccessResponseApi<InsightsDto[]>, AxiosError>(
+        ["insights", currentDate],
+        async () => TripApi.getStatisticsByDay(currentDate),
+        {
+            onError: (error) => {
+                setShowStatisticsError(true);
+            }
+        }
+    );
 
     const tripStatisticsClass = classNames(isStatisticsLoading && "animate-pulse", className);
 
@@ -28,9 +37,9 @@ export default function TripStatistics(props: {
             <h3 className="text-xl">Nations visited on this day</h3>
             {dateStatistics && (
                 <div className="mr-12">
-                    {dateStatistics.map((tripStatistic, idx) => {
+                    {dateStatistics.data.map((tripStatistic, idx) => {
                         if (tripStatistic && tripStatistic.count) {
-                            const numberOfStages = dateStatistics.reduce(
+                            const numberOfStages = dateStatistics.data.reduce(
                                 (prev, curr) => (curr.count ? prev + curr.count : prev),
                                 0
                             );
@@ -54,24 +63,23 @@ export default function TripStatistics(props: {
                 </div>
             )}
 
-            {statisticsError && (
-                <Modal
-                    show={true}
-                    actionButtons={
-                        <Button accent={true} onClick={resetStatisticsError}>
-                            <span>Close</span>
-                        </Button>
-                    }
-                >
-                    <div className="flex justify-center">
-                        <img src={warning} alt={"warning"} className="w-16 h-16" />
-                    </div>
-                    <div className="mt-4">
-                        <div>{statisticsError[0]}</div>
-                        {statisticsError[1] && <div className="text-medium">{statisticsError[1]}</div>}
-                    </div>
-                </Modal>
-            )}
+            <Modal
+                show={showStatisticsError}
+                actionButtons={
+                    <Button accent={true} onClick={() => setShowStatisticsError(false)}>
+                        <span>Close</span>
+                    </Button>
+                }
+            >
+                <div className="flex justify-center">
+                    <img src={warning} alt={"warning"} className="w-16 h-16" />
+                </div>
+                <div className="mt-4">
+                    <div>{statisticsError?.message}</div>
+                    <div className="text-medium">{statisticsError?.response?.data?.error}</div>
+                </div>
+            </Modal>
+
         </div>
     );
 }

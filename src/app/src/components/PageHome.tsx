@@ -1,22 +1,23 @@
-import React, { useState } from "react";
-import { TripDto } from "@aindo/dto";
+import React, {useState} from "react";
+import {SuccessResponseApi, TripDto} from "@aindo/dto";
 import TripView from "./block/TripView";
 import Navbar from "./common/Navbar";
 import TripStatistics from "./block/TripStatistics";
-import { dateDecoder, dateEncoder, validateDateEncoded } from "../utils/dateUtils";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { TripApi } from "../network/TripApi";
-import { useGet } from "../customHooks/useGet";
-import { Button } from "./common/Button";
-import { PlusIcon, RefreshIcon } from "@heroicons/react/solid";
-import { Modal } from "./common/Modal";
+import {dateDecoder, dateEncoder, validateDateEncoded} from "../utils/dateUtils";
+import {useNavigate} from "react-router-dom";
+import {TripApi} from "../network/TripApi";
+import {Button} from "./common/Button";
+import {PlusIcon, RefreshIcon} from "@heroicons/react/solid";
+import {Modal} from "./common/Modal";
 import warning from "../img/warning.png";
-import { useDateUrlParam } from "../customHooks/useDateUrlParam";
+import {useDateUrlParam} from "../customHooks/useDateUrlParam";
 import CalendarView from "./block/CalendarView";
-import { useAuth } from "../customHooks/useAuth";
+import {useQuery} from "react-query";
+import {AxiosError} from "axios";
 
 export default function PageHome() {
     const navigate = useNavigate();
+    const [showFetchError, setShowFetchError] = useState(false);
 
     const { date: currentDate, setDate: setCurrentDate } = useDateUrlParam(
         dateEncoder,
@@ -27,8 +28,16 @@ export default function PageHome() {
     const {
         isLoading: isFetchLoading,
         error: fetchError,
-        dto: selectedTrips,
-    } = useGet<TripDto[]>((date) => TripApi.getTripsByDate(date), currentDate);
+        data: selectedTrips,
+    } = useQuery<SuccessResponseApi<TripDto[]>, AxiosError>(
+        ["trips", currentDate],
+        async () => TripApi.getTripsByDate(currentDate),
+        {
+            onError: (error) => {
+                setShowFetchError(true);
+            }
+        }
+        );
 
     const navigateToPage = (url: string) => {
         navigate(url);
@@ -50,28 +59,26 @@ export default function PageHome() {
             </Navbar>
 
             {/* Map body and cards */}
-            <TripView trips={selectedTrips || []} onNavigate={navigateToPage} />
+            <TripView trips={selectedTrips?.data || []} onNavigate={navigateToPage}/>
 
             {/* Error modal */}
-            {fetchError && (
-                <Modal
-                    show={true}
-                    actionButtons={
-                        <Button accent={true} onClick={() => window.location.reload()}>
-                            <span>Reload</span>
-                            <RefreshIcon className="w-4 h-4" />
-                        </Button>
-                    }
-                >
-                    <div className="flex justify-center">
-                        <img src={warning} alt={"warning"} className="w-16 h-16" />
-                    </div>
-                    <div className="mt-4">
-                        <div>{fetchError[0]}</div>
-                        {fetchError[1] && <div className="text-medium">{fetchError[1]}</div>}
-                    </div>
-                </Modal>
-            )}
+            <Modal
+                show={showFetchError}
+                actionButtons={
+                    <Button accent={true} onClick={() => window.location.reload()}>
+                        <span>Reload</span>
+                        <RefreshIcon className="w-4 h-4" />
+                    </Button>
+                }
+            >
+                <div className="flex justify-center">
+                    <img src={warning} alt={"warning"} className="w-16 h-16" />
+                </div>
+                <div className="mt-4">
+                    <div>{fetchError?.message}</div>
+                    <div className="text-medium">{fetchError?.response?.data?.error}</div>
+                </div>
+            </Modal>
 
         </div>
     );

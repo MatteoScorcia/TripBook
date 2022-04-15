@@ -5,7 +5,6 @@ import {JwtPayload} from "jsonwebtoken";
 
 export function authorizationHeaderValidator() {
 	return async (ctx, next) => {
-		console.log("validate auhth")
 		if (!ctx.header.authorization) {
 			ctx.status = 403;
 			ctx.body = { error: "Authorization header not provided" } as ErrorResponseApi<JwtToSignDto>;
@@ -22,7 +21,6 @@ export function authorizationHeaderValidator() {
 		try {
 			const decoded = jwt.verify(tokenRequest, config.secretKey);
 			ctx.auth = { userId: (decoded as JwtPayload).user.userId };
-			console.log("here");
 		} catch (err) {
 			ctx.status = 403;
 			ctx.body = { error: "invalid token" } as ErrorResponseApi<JwtToSignDto>;
