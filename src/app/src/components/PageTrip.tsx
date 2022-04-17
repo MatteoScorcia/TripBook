@@ -25,9 +25,10 @@ export default function PageTrip() {
     // State machine
     const createNew = params.id === "new";
     const [stateEditMode, setEditMode] = useState(false);
-    const [showFetchError, setShowFetchError] = useState(false);
-    const [showSaveError, setShowSaveError] = useState(false);
-    const [showDeleteError, setShowDeleteError] = useState(false);
+    // const [showFetchError, setShowFetchError] = useState(false);
+    // const [showSaveError, setShowSaveError] = useState(false);
+    // const [showDeleteError, setShowDeleteError] = useState(false);
+    const [showErrors, setShowErrors] = useState(false);
 
     const editMode = stateEditMode || createNew
 
@@ -58,7 +59,7 @@ export default function PageTrip() {
                 }
             }),
             onError: (error) => {
-                setShowFetchError(true);
+                setShowErrors(true);
             },
             enabled: !createNew
         }
@@ -93,7 +94,7 @@ export default function PageTrip() {
                 setEditMode(false);
             },
             onError: (error, updatedTrip, context) => {
-                setShowSaveError(true);
+                setShowErrors(true);
                 if(!createNew && context) {
                     queryClient.setQueryData(["todos", context.updatedTrip._id], context.rollbackTrip);
                 }
@@ -101,28 +102,43 @@ export default function PageTrip() {
         }
     );
 
-    const [deleteLoading, setDeleteLoading] = useState(false);
-    const [deleteError, setDeleteError] = useState<AxiosError | undefined>(undefined);
+    // const [deleteLoading, setDeleteLoading] = useState(false);
+    // const [deleteError, setDeleteError] = useState<AxiosError | undefined>(undefined);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    //todo: useMutate() for delete!!
-    const handleDelete = () => {
-        if (!createNew) {
-            setDeleteLoading(true);
-            setDeleteError(undefined);
-            TripApi.deleteTrip(params.id!)
-                .then((res) => {
-                    navigate(`/?date=${dateEncoder(currentDate)}`);
-                })
-                .catch((err: AxiosError) => {
-                    setDeleteError(err);
-                    setShowDeleteError(true);
-                })
-                .finally(() => {
-                    setDeleteLoading(false);
-                });
+    // const handleDelete = () => {
+    //     if (!createNew) {
+    //         setDeleteLoading(true);
+    //         setDeleteError(undefined);
+    //         TripApi.deleteTrip(params.id!)
+    //             .then((res) => {
+    //                 navigate(`/?date=${dateEncoder(currentDate)}`);
+    //             })
+    //             .catch((err: AxiosError) => {
+    //                 setDeleteError(err);
+    //                 setShowDeleteError(true);
+    //             })
+    //             .finally(() => {
+    //                 setDeleteLoading(false);
+    //             });
+    //     }
+    // };
+
+    const {
+        mutateAsync: del,
+        isLoading: isDeleteLoading,
+        error: deleteError,
+    } = useMutation<SuccessResponseApi<TripDto>, AxiosError, TripDto>(
+        async () => TripApi.deleteTrip(localTrip._id!),
+        {
+            onSuccess: () => {
+                navigate(`/?date=${dateEncoder(currentDate)}`);
+            },
+            onError: () => {
+                setShowErrors(true);
+            },
         }
-    };
+    );
 
     // Status handling
     const handleDateChange = (newDate: Date) => {
@@ -151,9 +167,11 @@ export default function PageTrip() {
         }
     }
 
+    const allErrors = saveError || deleteError || fetchError;
+
     return (
         <div className="flex w-screen h-screen">
-            <Navbar className={isSaveLoading || deleteLoading || isFetchLoading ? "animate-pulse" : ""}>
+            <Navbar className={isSaveLoading || isDeleteLoading || isFetchLoading ? "animate-pulse" : ""}>
                 <div className="flex space-x-1 self-end">
                     {!editMode && (
                         <>
@@ -206,15 +224,15 @@ export default function PageTrip() {
                     onEdit={patchLocalTrip}
                 />
 
-            {/* Error Modals */}
+            {/* Confirm Delete Modal */}
             <Modal
                 show={showDeleteModal}
                 onClickOutsideModal={() => setShowDeleteModal(false)}
                 actionButtons={
                     <div className="flex space-x-1 w-full justify-between">
-                        <Button accent={true} onClick={() => {
+                        <Button accent={true} onClick={async () => {
                             setShowDeleteModal(false);
-                            handleDelete()
+                            await del(localTrip);
                         }}>
                             <span>Confirm</span>
                         </Button>
@@ -230,11 +248,12 @@ export default function PageTrip() {
                 </div>
             </Modal>
 
+            {/* Error Modals */}
             <Modal
-                show={showDeleteError}
-                onClickOutsideModal={() => setShowDeleteError(false)}
+                show={showErrors}
+                onClickOutsideModal={() => setShowErrors(false)}
                 actionButtons={
-                    <Button accent={true} onClick={() => setShowDeleteError(false)}>
+                    <Button accent={true} onClick={() => setShowErrors(false)}>
                         <span>Close</span>
                     </Button>
                 }
@@ -243,44 +262,8 @@ export default function PageTrip() {
                     <img src={warning} alt={"warning"} className="w-16 h-16" />
                 </div>
                 <div className="mt-4">
-                    <div>{deleteError?.message}</div>
-                    <div>{deleteError?.response?.data.error}</div>
-                </div>
-            </Modal>
-
-            <Modal
-                show={showSaveError}
-                onClickOutsideModal={() => setShowSaveError(false)}
-                actionButtons={
-                    <Button accent={true} onClick={() => setShowSaveError(false)}>
-                        <span>Close</span>
-                    </Button>
-                }
-            >
-                <div className="flex justify-center">
-                    <img src={warning} alt={"warning"} className="w-16 h-16" />
-                </div>
-                <div className="mt-4">
-                    <div>{saveError?.message}</div>
-                    <div>{saveError?.response?.data.error}</div>
-                </div>
-            </Modal>
-
-            <Modal
-                show={showFetchError}
-                onClickOutsideModal={() => setShowFetchError(false)}
-                actionButtons={
-                    <Button accent={true} onClick={() => setShowFetchError(false)}>
-                        <span>Close</span>
-                    </Button>
-                }
-            >
-                <div className="flex justify-center">
-                    <img src={warning} alt={"warning"} className="w-16 h-16" />
-                </div>
-                <div className="mt-4">
-                    <div>{fetchError?.message}</div>
-                    <div>{fetchError?.response?.data.error}</div>
+                    <div>{allErrors?.message}</div>
+                    <div>{allErrors?.response?.data.error}</div>
                 </div>
             </Modal>
 
