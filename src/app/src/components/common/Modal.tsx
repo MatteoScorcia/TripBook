@@ -5,18 +5,18 @@ import { Card } from "./Card";
 export function Modal(props: {
     children?: React.ReactNode;
     title?: string;
-    actionButtons?: JSX.Element;
+    actionButtons?: React.ReactNode;
     show: boolean;
     onClickOutsideModal?: any;
 }) {
-    // const {children, header, footer, show, onClickOutsideModal} = props;
+    const { children, title, actionButtons, show, onClickOutsideModal } = props;
 
     ReactModal.setAppElement("#root");
 
     return (
         <ReactModal
-            isOpen={props.show}
-            onRequestClose={props.onClickOutsideModal}
+            isOpen={show}
+            onRequestClose={onClickOutsideModal}
             shouldCloseOnOverlayClick={true}
             style={{
                 overlay: {
@@ -43,10 +43,10 @@ export function Modal(props: {
         >
             <Card
                 className="w-full max-w-[24rem] min-h-[16rem] break-words"
-                title={<span className="uppercase">{props.title}</span>}
-                actions={props.actionButtons}
+                title={<span className="uppercase">{title}</span>}
+                actions={actionButtons}
             >
-                {props.children}
+                {children}
             </Card>
         </ReactModal>
     );

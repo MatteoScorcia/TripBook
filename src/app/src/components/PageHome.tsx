@@ -1,30 +1,32 @@
-import React, {useState} from "react";
-import {SuccessResponseApi, TripDto} from "@aindo/dto";
+import React, { useState } from "react";
+import { SuccessResponseApi, TripDto } from "@aindo/dto";
 import TripView from "./block/TripView";
 import Navbar from "./common/Navbar";
 import TripStatistics from "./block/TripStatistics";
-import {dateDecoder, dateEncoder, validateDateEncoded} from "../utils/dateUtils";
-import {useNavigate} from "react-router-dom";
-import {TripApi} from "../network/TripApi";
-import {Button} from "./common/Button";
-import {PlusIcon, RefreshIcon} from "@heroicons/react/solid";
-import {Modal} from "./common/Modal";
+import { dateDecoder, dateEncoder, validateDateEncoded } from "../utils/dateUtils";
+import { useNavigate } from "react-router-dom";
+import { TripApi } from "../network/TripApi";
+import { Button } from "./common/Button";
+import { PlusIcon, RefreshIcon } from "@heroicons/react/solid";
+import { Modal } from "./common/Modal";
 import warning from "../img/warning.png";
-import {useDateUrlParam} from "../customHooks/useDateUrlParam";
+import { useDateUrlParam } from "../customHooks/useDateUrlParam";
 import CalendarView from "./block/CalendarView";
-import {useQuery} from "react-query";
-import {AxiosError} from "axios";
+import { useQuery } from "react-query";
+import { AxiosError } from "axios";
 
 export default function PageHome() {
     const navigate = useNavigate();
     const [showFetchError, setShowFetchError] = useState(false);
 
+    //current date from url parameter
     const { date: currentDate, setDate: setCurrentDate } = useDateUrlParam(
         dateEncoder,
         dateDecoder,
         validateDateEncoded
     );
 
+    //GET action
     const {
         isLoading: isFetchLoading,
         error: fetchError,
@@ -35,9 +37,9 @@ export default function PageHome() {
         {
             onError: (error) => {
                 setShowFetchError(true);
-            }
+            },
         }
-        );
+    );
 
     const navigateToPage = (url: string) => {
         navigate(url);
@@ -59,9 +61,9 @@ export default function PageHome() {
             </Navbar>
 
             {/* Map body and cards */}
-            <TripView trips={selectedTrips?.data || []} onNavigate={navigateToPage}/>
+            <TripView trips={selectedTrips?.data || []} onNavigate={navigateToPage} />
 
-            {/* Error modal */}
+            {/* Error Modal */}
             <Modal
                 show={showFetchError}
                 actionButtons={
@@ -79,7 +81,6 @@ export default function PageHome() {
                     <div className="text-medium">{fetchError?.response?.data?.error}</div>
                 </div>
             </Modal>
-
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import * as Router from "koa-router";
 import { TripModel } from "../models/TripModel";
-import {ErrorResponseApi, InsightsDto, SuccessResponseApi} from "@aindo/dto";
+import { ErrorResponseApi, InsightsDto, SuccessResponseApi } from "@aindo/dto";
 
 const router = new Router();
 

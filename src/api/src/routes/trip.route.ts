@@ -1,5 +1,5 @@
 import * as Router from "koa-router";
-import {ErrorResponseApi, InsightsDto, SuccessResponseApi, TripDto} from "@aindo/dto";
+import { ErrorResponseApi, InsightsDto, SuccessResponseApi, TripDto } from "@aindo/dto";
 import { TripModel } from "../models/TripModel";
 import * as mongoose from "mongoose";
 
@@ -52,7 +52,6 @@ router.get("/:id", async (ctx) => {
 });
 
 router.get("/", async (ctx) => {
-
     const retrievedTrips = await TripModel.find({
         date: ctx.query.date ? ctx.query.date : undefined,
         user_id: ctx.auth.userId,

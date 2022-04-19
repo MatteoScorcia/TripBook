@@ -1,5 +1,5 @@
 import * as Router from "koa-router";
-import {ErrorResponseApi, JwtDto, SuccessResponseApi, UserDto} from "@aindo/dto";
+import { ErrorResponseApi, JwtDto, SuccessResponseApi, UserDto } from "@aindo/dto";
 import { UserModel } from "../models/UserModel";
 
 import * as jwt from "jsonwebtoken";
@@ -20,7 +20,9 @@ router.use(async (ctx, next) => {
 
     if (!user.name || user.name.length < 4) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid name field, at least 4 characters required" } as ErrorResponseApi<UserDto>;
+        ctx.body = {
+            error: "Invalid name field, at least 4 characters required",
+        } as ErrorResponseApi<UserDto>;
         return;
     }
 
@@ -46,7 +48,9 @@ router.post("/signup", async (ctx) => {
 
     if (!userToSave.name || !userToSave.name.match(/^[^\W\d_]+$/)) {
         ctx.status = 400;
-        ctx.body = { error: "Invalid user field special characters and spaces not allowed" } as ErrorResponseApi<UserDto>;
+        ctx.body = {
+            error: "Invalid user field special characters and spaces not allowed",
+        } as ErrorResponseApi<UserDto>;
         return;
     }
 

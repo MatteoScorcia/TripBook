@@ -1,4 +1,4 @@
-import {JwtDto, SuccessResponseApi, UserDto} from "@aindo/dto";
+import { JwtDto, SuccessResponseApi, UserDto } from "@aindo/dto";
 import axios from "axios";
 
 const apiRootURL = "/api";

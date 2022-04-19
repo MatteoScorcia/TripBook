@@ -45,10 +45,11 @@ The application will allow a registered user to store information relating to th
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### TL;DR
+
 1. Build and run the docker containers
-   ```sh
-       docker compose up -d
-   ```
+    ```sh
+        docker compose up -d
+    ```
 2. Navigate to "http://localhost:8888"
 
 <div id="getting-started"></div>

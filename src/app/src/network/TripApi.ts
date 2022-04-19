@@ -1,4 +1,4 @@
-import {InsightsDto, SuccessResponseApi, TripDto} from "@aindo/dto";
+import { InsightsDto, SuccessResponseApi, TripDto } from "@aindo/dto";
 import { dateCoalesce } from "../utils/dateUtils";
 import axios from "axios";
 

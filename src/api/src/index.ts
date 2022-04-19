@@ -3,16 +3,16 @@ import * as logger from "koa-logger";
 import * as json from "koa-json";
 import * as bodyParser from "koa-bodyparser";
 
-import {TripRouter} from "./routes/trip.route";
-import {AuthRouter} from "./routes/auth.route";
-import {InsightRouter} from "./routes/insight.route";
-import {connectToMongoDB} from "./dal";
+import { TripRouter } from "./routes/trip.route";
+import { AuthRouter } from "./routes/auth.route";
+import { InsightRouter } from "./routes/insight.route";
+import { connectToMongoDB } from "./dal";
 import * as Router from "koa-router";
 
 import config from "./config";
 import * as send from "koa-send";
-import {authorizationHeaderValidator} from "./middlewares/authorizationHeaderValidator";
-import {internalErrorCatcher} from "./middlewares/internalErrorCatcher";
+import { authorizationHeaderValidator } from "./middlewares/authorizationHeaderValidator";
+import { internalErrorCatcher } from "./middlewares/internalErrorCatcher";
 
 declare module "koa" {
     interface BaseContext {

@@ -1,5 +1,5 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
-import axios, {AxiosError} from "axios";
+import axios, { AxiosError } from "axios";
 import { UserDto } from "@aindo/dto";
 
 export interface AuthState {

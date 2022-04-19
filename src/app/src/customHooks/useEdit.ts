@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { usePatch } from "./usePatch";
-import {SuccessResponseApi} from "@aindo/dto";
+import { SuccessResponseApi } from "@aindo/dto";
 
 interface UseEditHookState<D> {
     isLoading: boolean;

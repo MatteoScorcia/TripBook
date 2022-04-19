@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo } from "react";
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { TripDto, TripPathPointDto } from "@aindo/dto";
-import L, { LatLngLiteral, LatLngTuple } from "leaflet";
+import { LatLngLiteral, LatLngTuple } from "leaflet";
 import { Button } from "../common/Button";
 
-function computeCenterTrip(trip: TripDto): LatLngLiteral {
-    const lat = trip.paths.map((x) => x.lat).reduce((a, b) => a + b, 0) / trip.paths.length;
-    const lng = trip.paths.map((x) => x.lng).reduce((a, b) => a + b, 0) / trip.paths.length;
-    return { lat, lng };
-}
+// function computeCenterTrip(trip: TripDto): LatLngLiteral {
+//     const lat = trip.paths.map((x) => x.lat).reduce((a, b) => a + b, 0) / trip.paths.length;
+//     const lng = trip.paths.map((x) => x.lng).reduce((a, b) => a + b, 0) / trip.paths.length;
+//     return { lat, lng };
+// }
 
 export default function TripMapView(props: {
     //trip or trip[] to work with.

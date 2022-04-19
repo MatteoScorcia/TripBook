@@ -1,47 +1,44 @@
-import React, {useEffect, useState} from "react";
-import {SuccessResponseApi, TripDto} from "@aindo/dto";
-import {useNavigate, useParams} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { SuccessResponseApi, TripDto } from "@aindo/dto";
+import { useNavigate, useParams } from "react-router-dom";
 import TripMapView from "./block/TripMapView";
-import {dateDecoder, dateEncoder, validateDateEncoded} from "../utils/dateUtils";
+import { dateDecoder, dateEncoder, validateDateEncoded } from "../utils/dateUtils";
 import Navbar from "./common/Navbar";
-import {TripApi} from "../network/TripApi";
-import {Button} from "./common/Button";
+import { TripApi } from "../network/TripApi";
+import { Button } from "./common/Button";
 import TripVehicleSelector from "./block/TripVehicleSelector";
-import {Modal} from "./common/Modal";
+import { Modal } from "./common/Modal";
 import TripMainInfoBadge from "./common/TripMainInfoBadge";
 import warning from "../img/warning.png";
 import remove from "../img/remove.png";
-import {Calendar} from "./common/Calendar";
-import {TripPathView} from "./common/TripPathView";
-import {useDateUrlParam} from "../customHooks/useDateUrlParam";
-import {useMutation, useQuery, useQueryClient} from "react-query";
-import {AxiosError} from "axios";
-import {usePatch} from "../customHooks/usePatch";
+import { Calendar } from "./common/Calendar";
+import { TripPathView } from "./common/TripPathView";
+import { useDateUrlParam } from "../customHooks/useDateUrlParam";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { AxiosError } from "axios";
+import { usePatch } from "../customHooks/usePatch";
 
 export default function PageTrip() {
     const params = useParams();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     // State machine
     const createNew = params.id === "new";
     const [stateEditMode, setEditMode] = useState(false);
-    // const [showFetchError, setShowFetchError] = useState(false);
-    // const [showSaveError, setShowSaveError] = useState(false);
-    // const [showDeleteError, setShowDeleteError] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showErrors, setShowErrors] = useState(false);
 
-    const editMode = stateEditMode || createNew
+    const editMode = stateEditMode || createNew;
 
     // URL
     const { date: currentDate, setDate: setCurrentDate } = useDateUrlParam(
         dateEncoder,
         dateDecoder,
-        validateDateEncoded,
+        validateDateEncoded
     );
 
-    // HTTP actions
-    const queryClient = useQueryClient()
-
+    //GET action
     const {
         isLoading: isFetchLoading,
         error: fetchError,
@@ -56,80 +53,65 @@ export default function PageTrip() {
                     distance: 0,
                     paths: [],
                     vehicle: "car",
-                }
+                },
             }),
             onError: (error) => {
                 setShowErrors(true);
             },
-            enabled: !createNew
+            enabled: !createNew,
         }
     );
 
-    //Local state to edit
+    //Local state of the current trip
     const [localTrip, setLocalTrip, patchLocalTrip] = usePatch<TripDto>(queryTrip!.data);
 
     useEffect(() => {
-        if(!createNew) {
+        if (!createNew) {
             patchLocalTrip(queryTrip!.data);
         }
     }, [queryTrip]);
 
+    // UPDATE and SAVE actions
     const {
         mutateAsync: save,
         isLoading: isSaveLoading,
         error: saveError,
-    } = useMutation<SuccessResponseApi<TripDto>, AxiosError, TripDto, {updatedTrip: TripDto, rollbackTrip: TripDto}>(
-        async () => createNew ? TripApi.saveTrip(localTrip) : TripApi.updateTrip(localTrip),
-        {
-            onMutate: async (updatedTrip) => {
-                    if(!createNew) {
-                        await queryClient.cancelQueries(["trips", updatedTrip._id]);
-                        const rollbackTrip = queryClient.getQueryData<SuccessResponseApi<TripDto>>(["trips", updatedTrip._id])!.data;
-                        queryClient.setQueryData(["trips", updatedTrip._id], updatedTrip);
-                        return {rollbackTrip, updatedTrip};
-                    }
-            },
-            onSuccess: async (data) => {
-                await queryClient.invalidateQueries(["trips", data.data._id]);
-                setEditMode(false);
-            },
-            onError: (error, updatedTrip, context) => {
-                setShowErrors(true);
-                if(!createNew && context) {
-                    queryClient.setQueryData(["todos", context.updatedTrip._id], context.rollbackTrip);
-                }
-            },
-        }
-    );
+    } = useMutation<
+        SuccessResponseApi<TripDto>,
+        AxiosError,
+        TripDto,
+        { updatedTrip: TripDto; rollbackTrip: TripDto }
+    >(async (trip) => (createNew ? TripApi.saveTrip(trip) : TripApi.updateTrip(trip)), {
+        onMutate: async (updatedTrip) => {
+            if (!createNew) {
+                await queryClient.cancelQueries(["trips", updatedTrip._id]);
+                const rollbackTrip = queryClient.getQueryData<SuccessResponseApi<TripDto>>([
+                    "trips",
+                    updatedTrip._id,
+                ])!.data;
+                queryClient.setQueryData(["trips", updatedTrip._id], updatedTrip);
+                return { rollbackTrip, updatedTrip };
+            }
+        },
+        onSuccess: async (data) => {
+            await queryClient.invalidateQueries(["trips", data.data._id]);
+            setEditMode(false);
+        },
+        onError: (error, updatedTrip, context) => {
+            setShowErrors(true);
+            if (!createNew && context) {
+                queryClient.setQueryData(["todos", context.updatedTrip._id], context.rollbackTrip);
+            }
+        },
+    });
 
-    // const [deleteLoading, setDeleteLoading] = useState(false);
-    // const [deleteError, setDeleteError] = useState<AxiosError | undefined>(undefined);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-    // const handleDelete = () => {
-    //     if (!createNew) {
-    //         setDeleteLoading(true);
-    //         setDeleteError(undefined);
-    //         TripApi.deleteTrip(params.id!)
-    //             .then((res) => {
-    //                 navigate(`/?date=${dateEncoder(currentDate)}`);
-    //             })
-    //             .catch((err: AxiosError) => {
-    //                 setDeleteError(err);
-    //                 setShowDeleteError(true);
-    //             })
-    //             .finally(() => {
-    //                 setDeleteLoading(false);
-    //             });
-    //     }
-    // };
-
+    //DELETE action
     const {
         mutateAsync: del,
         isLoading: isDeleteLoading,
         error: deleteError,
     } = useMutation<SuccessResponseApi<TripDto>, AxiosError, TripDto>(
-        async () => TripApi.deleteTrip(localTrip._id!),
+        async (trip) => TripApi.deleteTrip(trip._id!),
         {
             onSuccess: () => {
                 navigate(`/?date=${dateEncoder(currentDate)}`);
@@ -147,8 +129,8 @@ export default function PageTrip() {
     };
 
     const handleSave = () => {
-        save(localTrip).then(updatedTrip => {
-            if(createNew) {
+        save(localTrip).then((updatedTrip) => {
+            if (createNew) {
                 navigate(`/trip/${updatedTrip.data._id}`);
             }
         });
@@ -162,10 +144,12 @@ export default function PageTrip() {
         if (createNew) {
             navigate(`/?date=${dateEncoder(currentDate)}`);
         } else {
-            patchLocalTrip(queryClient.getQueryData<SuccessResponseApi<TripDto>>(["trips", localTrip._id])!.data);
+            patchLocalTrip(
+                queryClient.getQueryData<SuccessResponseApi<TripDto>>(["trips", localTrip._id])!.data
+            );
             setEditMode(false);
         }
-    }
+    };
 
     const allErrors = saveError || deleteError || fetchError;
 
@@ -218,11 +202,7 @@ export default function PageTrip() {
             </Navbar>
 
             {/* Map body */}
-                <TripMapView
-                    editable={editMode}
-                    trip={localTrip}
-                    onEdit={patchLocalTrip}
-                />
+            <TripMapView editable={editMode} trip={localTrip} onEdit={patchLocalTrip} />
 
             {/* Confirm Delete Modal */}
             <Modal
@@ -230,10 +210,13 @@ export default function PageTrip() {
                 onClickOutsideModal={() => setShowDeleteModal(false)}
                 actionButtons={
                     <div className="flex space-x-1 w-full justify-between">
-                        <Button accent={true} onClick={async () => {
-                            setShowDeleteModal(false);
-                            await del(localTrip);
-                        }}>
+                        <Button
+                            accent={true}
+                            onClick={async () => {
+                                setShowDeleteModal(false);
+                                await del(localTrip);
+                            }}
+                        >
                             <span>Confirm</span>
                         </Button>
                         <Button accent={false} onClick={() => setShowDeleteModal(false)}>
@@ -263,10 +246,9 @@ export default function PageTrip() {
                 </div>
                 <div className="mt-4">
                     <div>{allErrors?.message}</div>
-                    <div>{allErrors?.response?.data.error}</div>
+                    <div>{allErrors?.response?.data?.error}</div>
                 </div>
             </Modal>
-
         </div>
     );
 }

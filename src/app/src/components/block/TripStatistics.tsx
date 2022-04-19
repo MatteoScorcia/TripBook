@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import {InsightsDto, SuccessResponseApi} from "@aindo/dto";
+import { InsightsDto, SuccessResponseApi } from "@aindo/dto";
 import classNames from "classnames";
 import { TripApi } from "../../network/TripApi";
 import { Modal } from "../common/Modal";
 import { Button } from "../common/Button";
 import warning from "../../img/warning.png";
-import {useQuery} from "react-query";
-import {AxiosError} from "axios";
+import { useQuery } from "react-query";
+import { AxiosError } from "axios";
 
 export default function TripStatistics(props: {
     children?: JSX.Element;
@@ -26,7 +26,7 @@ export default function TripStatistics(props: {
         {
             onError: (error) => {
                 setShowStatisticsError(true);
-            }
+            },
         }
     );
 
@@ -79,7 +79,6 @@ export default function TripStatistics(props: {
                     <div className="text-medium">{statisticsError?.response?.data?.error}</div>
                 </div>
             </Modal>
-
         </div>
     );
 }
