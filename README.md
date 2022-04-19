@@ -5,12 +5,13 @@
 <!-- ABOUT THE PROJECT -->
 
 ## Web Programming 2022 - TripBook
-
+<p>
 We want to create a web application that acts as a chrono diary of one's movements.
-<br>
 The application will allow a registered user to store information relating to their trips to view them later.
-<br>
-Warning: the geofencing works only for European states because the database used is the official European Database [Nomenclature of territorial units for statistics (NUTS)](https://ec.europa.eu/eurostat/web/nuts/background)
+</p>
+
+NB: The geofencing works only for European states because the database used is the official European Database [Nomenclature of territorial units for statistics (NUTS)](https://ec.europa.eu/eurostat/web/nuts/background)
+
 
 <!-- TABLE OF CONTENTS -->
 <details>
