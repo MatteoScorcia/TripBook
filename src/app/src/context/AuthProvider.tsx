@@ -45,33 +45,6 @@ export const AuthProvider = (props: { children: ReactNode }) => {
         return storedState ? JSON.parse(storedState) : undefined;
     });
 
-    // useEffect(()=> {
-    // 	const reqIntercept = axios.interceptors.request.use(
-    // 		response => {
-    // 			if(response.headers && !response.headers['Authorization']) {
-    // 				response.headers['Authorization'] = `Bearer ${auth}`
-    // 			}
-    // 			return response;
-    // 		}
-    // 	);
-    //
-    // 	const respIntercept = axios.interceptors.response.use(
-    // 		response => {
-    // 			return response;
-    // 		},
-    // 		async (err) => {
-    // 			setAuth(undefined);
-    // 			sessionStorage.clear()
-    // 			return Promise.reject(err);
-    // 		}
-    // 	);
-    //
-    // 	return () => {
-    // 		axios.interceptors.request.eject(reqIntercept);
-    // 		axios.interceptors.response.eject(respIntercept);
-    // 	}
-    // }, [auth]);
-
     useEffect(() => {
         _AUTH_FAILED_CALLBACK = () => {
             setAuth(undefined);

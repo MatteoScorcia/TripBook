@@ -59,44 +59,6 @@ export function useAuth() {
         },
     });
 
-    // const signup = async (name: string, password: string, email: string) => {
-    //     return AuthApi.signUp({ name, password, email })
-    //         .then((res) => {
-    //         context.setAuth({
-    //             user: { name },
-    //             token: res.data!.token,
-    //             expiresIn: res.data!.expiresIn,
-    //         });
-    //         sessionStorage.setItem(
-    //             "authState",
-    //             JSON.stringify({
-    //                 user: { name },
-    //                 token: res.data!.token,
-    //                 expiresIn: res.data!.expiresIn,
-    //             })
-    //         );
-    //     });
-    // };
-    //
-    // const login = async (name: string, password: string) => {
-    //     return AuthApi.login({ name, password })
-    //         .then((res) => {
-    //         context.setAuth({
-    //             user: { name },
-    //             token: res.data!.token,
-    //             expiresIn: res.data!.expiresIn,
-    //         });
-    //         sessionStorage.setItem(
-    //             "authState",
-    //             JSON.stringify({
-    //                 user: { name },
-    //                 token: res.data!.token,
-    //                 expiresIn: res.data!.expiresIn,
-    //             })
-    //         );
-    //     });
-    // };
-
     const logout = () => {
         context.setAuth(undefined);
         sessionStorage.clear();
